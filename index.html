@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>С днём рождения, мама!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;width:100%;}
+    body{background:#f9e8e8;}
+    .scene{
+      background:#f9e8e8;
+      width:100%;
+      height:100vh;
+      height:100dvh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:20px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .petal{position:absolute;border-radius:50% 50% 50% 0;opacity:0;animation:fall linear infinite;pointer-events:none;}
+    @keyframes fall{0%{opacity:0;transform:translateY(-20px) rotate(0deg);}10%{opacity:.7;}90%{opacity:.4;}100%{opacity:0;transform:translateY(110vh) rotate(360deg);}}
+    .envelope-wrap{cursor:pointer;position:relative;z-index:10;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+    .envelope{width:min(300px,88vw);height:min(195px,57vw);position:relative;}
+    .env-body{position:absolute;inset:0;background:#fff8f0;border-radius:4px;border:1.5px solid #e8c4b8;overflow:hidden;}
+    .env-bottom-fold{position:absolute;bottom:0;left:0;right:0;height:52%;background:#fdf0ea;clip-path:polygon(0 100%,50% 0%,100% 100%);}
+    .env-left-fold{position:absolute;top:0;left:0;bottom:0;width:50%;background:#fce8e0;clip-path:polygon(0 0,100% 50%,0 100%);}
+    .env-right-fold{position:absolute;top:0;right:0;bottom:0;width:50%;background:#fce8e0;clip-path:polygon(100% 0,0 50%,100% 100%);}
+    .env-border-lines{position:absolute;inset:0;}
+    .env-border-lines::before,.env-border-lines::after{content:'';position:absolute;background:#e0b0a0;width:1px;}
+    .env-border-lines::before{top:0;left:0;height:70%;transform:rotate(33deg);transform-origin:top left;}
+    .env-border-lines::after{top:0;right:0;height:70%;transform:rotate(-33deg);transform-origin:top right;}
+    .env-flap{position:absolute;top:0;left:0;right:0;height:50%;background:#fff3ee;clip-path:polygon(0 0,50% 62%,100% 0);border-bottom:1.5px solid #e8c4b8;transform-origin:top;transition:transform .45s cubic-bezier(.4,0,.2,1),opacity .15s ease .4s;z-index:3;}
+    .envelope-wrap.open .env-flap{transform:rotateX(180deg);opacity:0;}
+    .envelope-wrap.closing .env-flap{transform:rotateX(0deg);opacity:1;transition:transform .45s cubic-bezier(.4,0,.2,1) .3s,opacity 0s;}
+    .seal{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;z-index:4;transition:opacity .4s ease;}
+    .envelope-wrap.open .seal{opacity:0;pointer-events:none;}
+    .card-container{position:absolute;top:10px;left:50%;transform:translateX(-50%) translateY(0);width:min(180px,52vw);transition:transform .6s cubic-bezier(.4,0,.2,1) .3s,opacity .4s ease .3s;opacity:0;z-index:2;}
+    .envelope-wrap.open .card-container{transform:translateX(-50%) translateY(min(-230px,-66vw));opacity:1;}
+    .card{width:100%;background:#fff;border:1px solid #e8c4b8;border-radius:4px;box-shadow:0 4px 20px rgba(180,100,80,.12);overflow:hidden;transition:transform .5s ease .9s;}
+    .envelope-wrap.open .card{transform:rotateY(-6deg);}
+    .card-front{padding:20px 14px 18px;text-align:center;background:#fffaf8;min-height:min(240px,65vw);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;}
+    .card-flowers{font-size:clamp(16px,5vw,22px);line-height:1;letter-spacing:3px;margin-bottom:2px;}
+    .card-subtitle{font-family:'Lora',serif;font-size:clamp(8px,2.2vw,10px);letter-spacing:3px;color:#c07060;text-transform:uppercase;}
+    .card-title{font-family:'Playfair Display',serif;font-size:clamp(24px,8vw,34px);font-weight:700;color:#6b2d2d;line-height:1;font-style:italic;}
+    .card-mama{font-family:'Playfair Display',serif;font-size:clamp(9px,2.8vw,12px);color:#c07060;letter-spacing:5px;text-transform:uppercase;margin-top:2px;}
+    .card-divider{width:50px;height:1px;background:#e8c4b8;margin:8px auto;}
+    .card-body{padding:12px 14px 16px;border-top:1px solid #f0ddd8;background:#fffaf9;}
+    .card-body p{font-family:'Lora',serif;font-size:clamp(9px,2.5vw,11px);color:#7a4a4a;line-height:1.7;font-style:italic;}
+    .card-body p+p{margin-top:8px;}
+    .signature{margin-top:12px;font-family:'Playfair Display',serif;font-size:clamp(10px,3vw,13px);color:#c07060;font-style:italic;text-align:right;}
+    .hint{margin-top:16px;text-align:center;font-family:'Lora',serif;font-size:13px;color:#c09090;font-style:italic;animation:pulse 2s ease-in-out infinite;transition:opacity .3s;position:relative;z-index:10;}
+    .hint.hidden{opacity:0;}
+    @keyframes pulse{0%,100%{opacity:.5;}50%{opacity:1;}}
+  </style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="envelope-wrap" id="envelope" onclick="toggle()">
+    <div class="envelope">
+      <div class="env-body">
+        <div class="env-left-fold"></div>
+        <div class="env-right-fold"></div>
+        <div class="env-bottom-fold"></div>
+        <div class="env-border-lines"></div>
+      </div>
+      <div class="card-container">
+        <div class="card">
+          <div class="card-front">
+            <div class="card-flowers">🌸🌷🌸</div>
+            <div class="card-subtitle">С днём рождения</div>
+            <div class="card-title">Мама</div>
+            <div class="card-divider"></div>
+            <div class="card-mama">С любовью</div>
+          </div>
+          <div class="card-body">
+            <p>Мамочка, поздравляю тебя с днём рождения!</p>
+            <p>Желаю счастья, здоровья и тепла — столько же, сколько ты дарила нам все эти годы.</p>
+            <p>Пусть каждый день будет наполнен солнцем и улыбками.</p>
+            <div class="signature">С любовью ❤️</div>
+          </div>
+        </div>
+      </div>
+      <div class="env-flap"></div>
+      <div class="seal">
+        <svg width="32" height="32" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="17" fill="#e8756a" stroke="#c05048" stroke-width="1"/>
+          <path d="M18 26C18 26 9 20 9 14C9 10.5 12 8 15 8.5C16.5 9 17.5 10 18 11.5C18.5 10 19.5 9 21 8.5C24 8 27 10.5 27 14C27 20 18 26 18 26Z" fill="#fff" opacity=".95"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="hint" id="hint">нажмите, чтобы открыть ✉️</div>
+</div>
+<script>
+  let isOpen=false;
+  function toggle(){
+    const env=document.getElementById('envelope');
+    const hint=document.getElementById('hint');
+    isOpen=!isOpen;
+    if(isOpen){
+      env.classList.remove('closing');
+      env.classList.add('open');
+      hint.classList.add('hidden');
+    } else {
+      env.classList.remove('open');
+      env.classList.add('closing');
+      setTimeout(()=>{env.classList.remove('closing');hint.classList.remove('hidden');},900);
+    }
+  }
+  const colors=['#f4a0b0','#f9c6c6','#f7b8d0','#ffc8d8','#e898b0'];
+  const scene=document.getElementById('scene');
+  for(let i=0;i<14;i++){
+    const p=document.createElement('div');
+    p.className='petal';
+    p.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*7}px;height:${10+Math.random()*9}px;animation-duration:${4+Math.random()*5}s;animation-delay:${Math.random()*6}s;transform:rotate(${Math.random()*360}deg);opacity:0;`;
+    scene.appendChild(p);
+  }
+</script>
+</body>
+</html>
